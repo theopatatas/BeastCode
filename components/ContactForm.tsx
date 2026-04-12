@@ -52,10 +52,19 @@ export default function ContactForm() {
         body: JSON.stringify(form),
       });
 
-      const data = (await response.json()) as { message?: string };
+      const raw = await response.text();
+      let data: { message?: string } = {};
+
+      try {
+        data = raw ? (JSON.parse(raw) as { message?: string }) : {};
+      } catch {
+        data = {};
+      }
 
       if (!response.ok) {
-        throw new Error(data.message || "Something went wrong.");
+        throw new Error(
+          data.message || "Unable to send your message right now.",
+        );
       }
 
       setStatus("success");
